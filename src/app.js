@@ -183,6 +183,13 @@ function renderCompatibility() {
             <option value="d5">D5W</option>
           </select>
         </div>
+        <div>
+          <label>Rule Policy</label>
+          <select id="cmpPolicy">
+            <option value="standard" selected>Standard (evidence-tiered)</option>
+            <option value="conservative">Conservative (limited evidence => avoid shared line)</option>
+          </select>
+        </div>
       </div>
 
       <div class="actions">
@@ -197,29 +204,92 @@ function renderCompatibility() {
     </section>
   `;
 
-  const incompatiblePairs = new Set([
-    'ampicillin-sulbactam|dexamethasone sp',
-    'dobutamine|sodium bicarbonate',
-    'dopamine|sodium bicarbonate',
-    'norepinephrine|sodium bicarbonate',
-    'pantoprazole|dexamethasone sp',
-    'vincristine|doxorubicin'
-  ]);
+  const pairRules = {
+    'ampicillin-sulbactam|dexamethasone sp': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Reported pH/solution instability concern in co-line setups.',
+      recommendation: 'Use separate lines/lumens.'
+    },
+    'dobutamine|sodium bicarbonate': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Catecholamine degradation risk in alkaline conditions.',
+      recommendation: 'Do not co-infuse via same line.'
+    },
+    'dopamine|sodium bicarbonate': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Catecholamine degradation risk in alkaline conditions.',
+      recommendation: 'Do not co-infuse via same line.'
+    },
+    'norepinephrine|sodium bicarbonate': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Catecholamine degradation risk in alkaline conditions.',
+      recommendation: 'Do not co-infuse via same line.'
+    },
+    'pantoprazole|dexamethasone sp': {
+      level: 'incompatible', evidence: 'moderate',
+      reason: 'Potential pH-driven instability depending on concentration/formulation.',
+      recommendation: 'Use separate lumen; verify compounding reference.'
+    },
+    'vincristine|doxorubicin': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Operationally high-risk chemotherapy combination in shared line context.',
+      recommendation: 'Separate chemo administration pathway only.'
+    },
 
-  const cautionPairs = new Set([
-    'cefazolin|metronidazole',
-    'cyclophosphamide|prednisolone sodium succinate',
-    'dopamine|lidocaine',
-    'enrofloxacin|metoclopramide',
-    'fentanyl|midazolam',
-    'ketamine|midazolam',
-    'magnesium sulfate|enrofloxacin',
-    'maropitant|ondansetron',
-    'norepinephrine|dobutamine',
-    'regular insulin|potassium chloride'
-  ]);
+    'cefazolin|metronidazole': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Condition-dependent compatibility in some settings.',
+      recommendation: 'Verify concentrations and Y-site reference before co-infusion.'
+    },
+    'cyclophosphamide|prednisolone sodium succinate': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Compatibility may vary by product/formulation.',
+      recommendation: 'Prefer separate lumen when feasible.'
+    },
+    'dopamine|lidocaine': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Some references report condition-specific results only.',
+      recommendation: 'Use caution; verify before shared line.'
+    },
+    'enrofloxacin|metoclopramide': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Potential compatibility variability with concentration/vehicle.',
+      recommendation: 'Prefer separate line if uncertain.'
+    },
+    'fentanyl|midazolam': {
+      level: 'caution', evidence: 'moderate',
+      reason: 'Often used together but still concentration/formulation dependent.',
+      recommendation: 'Accept with protocol + monitor line clarity/response.'
+    },
+    'ketamine|midazolam': {
+      level: 'caution', evidence: 'moderate',
+      reason: 'Common combination but depends on prep parameters.',
+      recommendation: 'Use protocol concentrations and verify policy.'
+    },
+    'magnesium sulfate|enrofloxacin': {
+      level: 'limited', evidence: 'limited',
+      reason: 'Conflicting/insufficient compatibility evidence reported.',
+      recommendation: 'Avoid shared line when possible; separate lumen preferred.'
+    },
+    'maropitant|ondansetron': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Data may be incomplete for all concentrations/formulations.',
+      recommendation: 'Check current compatibility source before Y-site.'
+    },
+    'norepinephrine|dobutamine': {
+      level: 'caution', evidence: 'moderate',
+      reason: 'Concurrent use common but requires protocolized line management.',
+      recommendation: 'Confirm concentration compatibility and monitor closely.'
+    },
+    'regular insulin|potassium chloride': {
+      level: 'caution', evidence: 'moderate',
+      reason: 'Frequent co-therapy; line compatibility depends on dilution/setup.',
+      recommendation: 'Use standardized ICU protocol and close monitoring.'
+    }
+  };
 
   const keyFor = (a, b) => [normalize(a), normalize(b)].sort().join('|');
+  const getPairRule = (a, b) => pairRules[keyFor(a, b)] || null;
   const selected = [];
   const selectedEl = document.getElementById('cmpSelected');
   const outEl = document.getElementById('cmpOut');
@@ -281,6 +351,7 @@ function renderCompatibility() {
 
   document.getElementById('cmpCheck').addEventListener('click', () => {
     const fluid = document.getElementById('cmpFluid').value;
+    const policy = document.getElementById('cmpPolicy').value;
     if (selected.length < 2) {
       outEl.innerHTML = '<div class="status-card status-red">Add at least two drugs to compare.</div>';
       return;
@@ -295,24 +366,35 @@ function renderCompatibility() {
       for (let j = i + 1; j < selected.length; j++) {
         const a = selected[i];
         const b = selected[j];
-        const key = keyFor(a, b);
+        const rule = getPairRule(a, b);
 
-        if (incompatiblePairs.has(key)) {
-          red += 1;
-          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br>Use separate lines/lumens.</div>`);
-        } else if (cautionPairs.has(key)) {
-          yellow += 1;
-          const reason = key === 'magnesium sulfate|enrofloxacin'
-            ? 'Conflicting/limited compatibility evidence in some settings.'
-            : 'Conditionally compatible depending on concentration/contact time.';
-          rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING DATA / CAUTION</strong> — ${a} + ${b}<br>${reason} Verify reference/pharmacy before Y-site co-infusion.</div>`);
-        } else {
+        if (!rule) {
           green += 1;
-          rows.push(`<div class="status-card status-green"><strong>COMPATIBLE (prototype rule)</strong> — ${a} + ${b}</div>`);
+          rows.push(`<div class="status-card status-green"><strong>COMPATIBLE (no conflict in current prototype set)</strong> — ${a} + ${b}</div>`);
+          continue;
         }
+
+        if (rule.level === 'incompatible') {
+          red += 1;
+          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+          continue;
+        }
+
+        if (rule.level === 'limited') {
+          if (policy === 'conservative') {
+            red += 1;
+            rows.push(`<div class="status-card status-red"><strong>LIMITED EVIDENCE (Conservative Policy => Treat as INCOMPATIBLE)</strong> — ${a} + ${b}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+          } else {
+            yellow += 1;
+            rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING / LIMITED DATA</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+          }
+          continue;
+        }
+
+        yellow += 1;
+        rows.push(`<div class="status-card status-yellow"><strong>USE CAUTION</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
       }
     }
-
     const fluidNote = fluid === 'lrs'
       ? 'LRS selected: calcium-containing fluid can change compatibility for some drugs.'
       : fluid === 'd5'
@@ -327,7 +409,7 @@ function renderCompatibility() {
 
     outEl.innerHTML = `
       ${overall}
-      <div class="status-summary">Checked ${selected.length} drugs (${(selected.length * (selected.length - 1)) / 2} pairings).</div>
+      <div class="status-summary">Checked ${selected.length} drugs (${(selected.length * (selected.length - 1)) / 2} pairings). Policy: <strong>${policy}</strong>.</div>
       ${rows.join('')}
       <div class="status-summary"><strong>Fluid Note:</strong> ${fluidNote}</div>
       <div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
