@@ -240,8 +240,9 @@ function renderCompatibility() {
     </section>
   `;
 
-  // Structured compatibility matrix seed (pairwise only)
-  const compatibilityMatrix = window.compatibilityMatrix || [];
+  // Structured compatibility registry (pairwise only)
+  const compatibilityRegistry = window.compatibilityRegistry || { source: null, legend: {}, rules: window.compatibilityMatrix || [] };
+  const compatibilityMatrix = compatibilityRegistry.rules || [];
 
   const keyFor = (a, b) => [normalize(a), normalize(b)].sort().join('|');
   const pairRules = Object.fromEntries(
@@ -249,6 +250,7 @@ function renderCompatibility() {
       keyFor(r.a, r.b),
       {
         level: r.level,
+        chartStatus: r.chartStatus,
         evidence: r.evidence,
         reason: r.reason,
         recommendation: r.recommendation,
@@ -344,7 +346,7 @@ function renderCompatibility() {
 
         if (rule.level === 'incompatible') {
           red += 1;
-          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
+          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           continue;
         }
 
@@ -354,13 +356,13 @@ function renderCompatibility() {
             rows.push(`<div class="status-card status-red"><strong>LIMITED EVIDENCE (Conservative Policy => Treat as INCOMPATIBLE)</strong> — ${a} + ${b}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           } else {
             yellow += 1;
-            rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING / LIMITED DATA</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
+            rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING / LIMITED DATA</strong> — ${a} + ${b}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           }
           continue;
         }
 
         yellow += 1;
-        rows.push(`<div class="status-card status-yellow"><strong>USE CAUTION</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
+        rows.push(`<div class="status-card status-yellow"><strong>USE CAUTION</strong> — ${a} + ${b}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Chart Status:</strong> ${rule.chartStatus || 'n/a'}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
       }
     }
     const fluidNote = fluid === 'lrs'
@@ -380,7 +382,7 @@ function renderCompatibility() {
       <div class="status-summary">Checked ${selected.length} drugs (${(selected.length * (selected.length - 1)) / 2} pairings). Policy: <strong>${policy}</strong>.</div>
       ${rows.join('')}
       <div class="status-summary"><strong>Fluid Note:</strong> ${fluidNote}</div>
-      <div class="status-summary">Source baseline includes Thames Valley Y-Site Compatibility Chart (2011) plus prototype rules.</div><div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
+      <div class="status-summary">Source baseline: ${compatibilityRegistry.source?.name || 'Compatibility registry'} (${compatibilityRegistry.source?.date || 'n/a'}).</div><div class="status-summary">Legend mapping: ✓ compatible, ✗ incompatible, v variable, ? unknown.</div><div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
     `;
   });
 
