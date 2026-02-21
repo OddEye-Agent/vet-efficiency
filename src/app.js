@@ -12,6 +12,7 @@ function renderDashboard() {
       <button class="tile" data-go="transfusion"><div class="icon">🐶🩸</div><h3>Canine Transfusion Volume</h3><p>Estimate blood transfusion mL from PCV/HCT values.</p></button>
       <button class="tile" data-go="rounding"><div class="icon">🩺📋</div><h3>UCI Vet Rounding Sheet</h3><p>Capture ICU round and handoff details.</p></button>
       <button class="tile" data-go="cri"><div class="icon">💉⚙️</div><h3>CRI Safety Calculator</h3><p>Compute infusion rate with safety checks.</p></button>
+      <button class="tile" data-go="compatibility"><div class="icon">🧪🔗</div><h3>Drug Compatibility Checker</h3><p>Check common co-infusion compatibility combinations.</p></button>
     </div>
   `;
   app.querySelectorAll('[data-go]').forEach((btn) => btn.addEventListener('click', () => renderView(btn.dataset.go)));
@@ -102,12 +103,117 @@ function renderCri() {
   });
 }
 
+function renderCompatibility() {
+  app.innerHTML = `
+    <h2>Drug Compatibility Checker</h2>
+    <section class="panel">
+      <div class="form-grid">
+        <div>
+          <label>Primary Infusion</label>
+          <select id="cmpA">
+            <option>Dopamine</option>
+            <option>Norepinephrine</option>
+            <option>Dobutamine</option>
+            <option>Lidocaine</option>
+            <option>Fentanyl</option>
+            <option>Midazolam</option>
+            <option>Regular Insulin</option>
+            <option>Potassium Chloride</option>
+          </select>
+        </div>
+        <div>
+          <label>Secondary Infusion</label>
+          <select id="cmpB">
+            <option>Norepinephrine</option>
+            <option>Dopamine</option>
+            <option>Dobutamine</option>
+            <option>Lidocaine</option>
+            <option>Fentanyl</option>
+            <option>Midazolam</option>
+            <option>Regular Insulin</option>
+            <option>Potassium Chloride</option>
+          </select>
+        </div>
+        <div>
+          <label>Carrier Fluid</label>
+          <select id="cmpFluid">
+            <option value="ns">0.9% NaCl</option>
+            <option value="lrs">LRS</option>
+            <option value="d5">D5W</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button class="primary" id="cmpCheck">Check Compatibility</button></div>
+      <div class="result" id="cmpOut">Select drugs and check compatibility.</div>
+    </section>
+  `;
+
+  const incompatiblePairs = new Set([
+    'dopamine|sodium bicarbonate',
+    'norepinephrine|sodium bicarbonate',
+    'dobutamine|sodium bicarbonate',
+    'potassium chloride|midazolam'
+  ]);
+
+  const cautionPairs = new Set([
+    'dopamine|lidocaine',
+    'norepinephrine|dobutamine',
+    'regular insulin|potassium chloride',
+    'fentanyl|midazolam'
+  ]);
+
+  const normalize = (s) => s.toLowerCase().trim();
+  const keyFor = (a, b) => {
+    const x = normalize(a);
+    const y = normalize(b);
+    return [x, y].sort().join('|');
+  };
+
+  document.getElementById('cmpCheck').addEventListener('click', () => {
+    const a = document.getElementById('cmpA').value;
+    const b = document.getElementById('cmpB').value;
+    const fluid = document.getElementById('cmpFluid').value;
+    const out = document.getElementById('cmpOut');
+
+    if (normalize(a) === normalize(b)) {
+      out.innerHTML = '<div class="warn">Select two different infusions to compare.</div>';
+      return;
+    }
+
+    const key = keyFor(a, b);
+
+    if (incompatiblePairs.has(key)) {
+      out.innerHTML = `<div class="warn"><strong>Result: Incompatible</strong><br>${a} + ${b} should not run together in the same line. Use separate lumens/lines.</div>`;
+      return;
+    }
+
+    let cautionText = '';
+    if (cautionPairs.has(key)) {
+      cautionText = `<div class="warn"><strong>Caution:</strong> ${a} + ${b} may be conditionally compatible depending on concentration, line contact time, and formulation. Verify with pharmacy/reference before Y-site co-infusion.</div>`;
+    }
+
+    const fluidNote = fluid === 'lrs'
+      ? 'LRS selected: confirm compatibility for each medication with calcium-containing fluids.'
+      : fluid === 'd5'
+        ? 'D5W selected: confirm drug stability in dextrose-containing fluids.'
+        : '0.9% NaCl selected: generally preferred for many vasopressor infusions.';
+
+    out.innerHTML = `
+      <div><strong>Result:</strong> No hard conflict detected for this pair in current prototype rules.</div>
+      <div style="margin-top:6px"><strong>Fluid check:</strong> ${fluidNote}</div>
+      ${cautionText}
+      <div style="margin-top:8px">Always confirm against your hospital formulary and a current compatibility reference before bedside administration.</div>
+    `;
+  });
+}
+
 function renderView(view) {
   setActive(view);
   if (view === 'dashboard') return renderDashboard();
   if (view === 'transfusion') return renderTransfusion();
   if (view === 'rounding') return renderRounding();
   if (view === 'cri') return renderCri();
+  if (view === 'compatibility') return renderCompatibility();
 }
 
 menuItems.forEach((btn) => btn.addEventListener('click', () => renderView(btn.dataset.view)));
