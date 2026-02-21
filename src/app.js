@@ -104,50 +104,75 @@ function renderCri() {
 }
 
 function renderCompatibility() {
-  const allDrugs = [
-    'Dopamine', 'Norepinephrine', 'Dobutamine', 'Lidocaine', 'Regular Insulin', 'Potassium Chloride',
-    'Ampicillin-Sulbactam', 'Cefazolin', 'Ceftriaxone', 'Enrofloxacin', 'Metronidazole', 'Piperacillin-Tazobactam',
-    'Fentanyl', 'Hydromorphone', 'Ketamine', 'Methadone', 'Midazolam', 'Dexmedetomidine',
-    'Maropitant', 'Ondansetron', 'Pantoprazole', 'Famotidine', 'Metoclopramide', 'Lactulose',
-    'Vincristine', 'Cyclophosphamide', 'Doxorubicin', 'Lomustine', 'Carboplatin',
-    'Dexamethasone SP', 'Prednisolone Sodium Succinate', 'Methylprednisolone Sodium Succinate',
-    'Sodium Bicarbonate'
+  const drugCatalog = [
+    { generic: 'Dopamine', common: 'Dopamine CRI', brands: ['Intropin'], bolus: 'Usually CRI only; bolus generally avoided unless directed by criticalist.', monitor: 'ECG/HR, BP, perfusion, arrhythmias.' },
+    { generic: 'Norepinephrine', common: 'Noradrenaline', brands: ['Levophed'], bolus: 'Typically CRI; if bolus used, micro-dosing only per protocol.', monitor: 'Continuous BP, perfusion, arrhythmias.' },
+    { generic: 'Dobutamine', common: 'Dobutamine CRI', brands: ['Dobutrex'], bolus: 'Generally CRI, avoid bolus.', monitor: 'ECG/HR, BP, lactate/perfusion.' },
+    { generic: 'Lidocaine', common: 'Lido', brands: ['Xylocaine'], bolus: 'Slow IV over ~1–2 min per antiarrhythmic protocol.', monitor: 'ECG, neurologic signs, BP.' },
+    { generic: 'Regular Insulin', common: 'Insulin CRI', brands: ['Humulin R', 'Novolin R'], bolus: 'Usually no IV bolus unless protocol-directed.', monitor: 'Glucose q1–2h, potassium, mentation.' },
+    { generic: 'Potassium Chloride', common: 'KCl', brands: ['KCl concentrate'], bolus: 'NEVER IV bolus.', monitor: 'ECG, rate/concentration limits, serial electrolytes.' },
+    { generic: 'Magnesium Sulfate', common: 'Magnesium', brands: ['MgSO4 injection'], bolus: 'Slow controlled IV per protocol (not rapid push).', monitor: 'ECG, BP, reflexes, magnesium level.' },
+
+    { generic: 'Ampicillin-Sulbactam', common: 'Unasyn', brands: ['Unasyn'], bolus: 'Intermittent infusion over protocol interval.', monitor: 'Allergy signs, GI tolerance.' },
+    { generic: 'Cefazolin', common: 'Cefazolin', brands: ['Ancef'], bolus: 'Slow IV over several minutes / short infusion.', monitor: 'Allergy, GI signs.' },
+    { generic: 'Ceftriaxone', common: 'Ceftriaxone', brands: ['Rocephin'], bolus: 'Slow IV / infusion per protocol.', monitor: 'Allergy, biliary/GI effects.' },
+    { generic: 'Enrofloxacin', common: 'Baytril', brands: ['Baytril'], bolus: 'Avoid rapid IV push; use slow infusion per label/protocol.', monitor: 'Site reaction, neurologic/GI signs.' },
+    { generic: 'Metronidazole', common: 'Metro', brands: ['Flagyl'], bolus: 'Infuse slowly (usually 20–60 min).', monitor: 'GI tolerance, neuro signs with prolonged use.' },
+    { generic: 'Piperacillin-Tazobactam', common: 'Pip-Tazo', brands: ['Zosyn'], bolus: 'Intermittent infusion per protocol.', monitor: 'Allergy, renal function.' },
+
+    { generic: 'Fentanyl', common: 'Fentanyl CRI', brands: ['Sublimaze'], bolus: 'Slow IV over 1–2 min.', monitor: 'Respiratory rate/effort, sedation, BP.' },
+    { generic: 'Hydromorphone', common: 'Hydromorphone', brands: ['Dilaudid'], bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, nausea/temperature.' },
+    { generic: 'Ketamine', common: 'Ketamine', brands: ['Ketalar'], bolus: 'Slow IV over 1–2 min when used as bolus.', monitor: 'HR/BP, dysphoria, sedation depth.' },
+    { generic: 'Methadone', common: 'Methadone', brands: ['Dolophine'], bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, HR.' },
+    { generic: 'Midazolam', common: 'Midaz', brands: ['Versed'], bolus: 'Slow IV over 1–2 min.', monitor: 'Sedation, respiratory status, paradoxical excitement.' },
+    { generic: 'Dexmedetomidine', common: 'Dexdomitor', brands: ['Dexdomitor'], bolus: 'Slow IV over 10 min or IM per protocol.', monitor: 'HR/rhythm, BP, perfusion, sedation depth.' },
+
+    { generic: 'Maropitant', common: 'Cerenia', brands: ['Cerenia'], bolus: 'Usually slow IV or SC per label.', monitor: 'Nausea/vomiting response, injection discomfort.' },
+    { generic: 'Ondansetron', common: 'Ondansetron', brands: ['Zofran'], bolus: 'Slow IV over 2–5 min.', monitor: 'Nausea control, QT risk in predisposed patients.' },
+    { generic: 'Pantoprazole', common: 'Pantoprazole', brands: ['Protonix'], bolus: 'Slow IV over several minutes or infusion.', monitor: 'GI signs, line compatibility.' },
+    { generic: 'Famotidine', common: 'Famotidine', brands: ['Pepcid'], bolus: 'Slow IV over 2 min.', monitor: 'HR/BP, GI response.' },
+    { generic: 'Metoclopramide', common: 'Metoclopramide CRI', brands: ['Reglan'], bolus: 'Slow IV bolus or CRI per protocol.', monitor: 'GI motility response, behavior changes.' },
+    { generic: 'Lactulose', common: 'Lactulose', brands: ['Kristalose'], bolus: 'Enteral medication, not IV infusion.', monitor: 'Stool output, hydration, electrolytes.' },
+
+    { generic: 'Vincristine', common: 'Vincristine', brands: ['Oncovin'], bolus: 'Chemo protocol only; controlled IV administration.', monitor: 'Extravasation risk, CBC, GI signs.' },
+    { generic: 'Cyclophosphamide', common: 'Cyclophosphamide', brands: ['Cytoxan'], bolus: 'Protocol-dependent controlled administration.', monitor: 'CBC, GI signs, urine precautions.' },
+    { generic: 'Doxorubicin', common: 'Doxorubicin', brands: ['Adriamycin'], bolus: 'Protocol infusion; avoid rapid push.', monitor: 'Extravasation, arrhythmia risk, CBC/chemistry.' },
+    { generic: 'Lomustine', common: 'CCNU', brands: ['CeeNU'], bolus: 'Oral chemo (not IV infusion).', monitor: 'CBC, liver enzymes.' },
+    { generic: 'Carboplatin', common: 'Carboplatin', brands: ['Paraplatin'], bolus: 'Protocol-dependent infusion timing.', monitor: 'CBC, renal values.' },
+
+    { generic: 'Dexamethasone SP', common: 'Dex SP', brands: ['Decadron'], bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI effects, immune suppression.' },
+    { generic: 'Prednisolone Sodium Succinate', common: 'Pred-S', brands: ['Solu-Delta-Cortef'], bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI status, fluid balance.' },
+    { generic: 'Methylprednisolone Sodium Succinate', common: 'MPSS', brands: ['Solu-Medrol'], bolus: 'Slow IV over 2–5 min.', monitor: 'BP, glucose, GI/immune effects.' },
+
+    { generic: 'Sodium Bicarbonate', common: 'Bicarb', brands: ['NaHCO3 injection'], bolus: 'Give slowly with protocol-guided dosing.', monitor: 'Blood gas, electrolytes (Ca/K), ECG.' },
+    { generic: 'Epinephrine', common: 'Adrenaline', brands: ['Adrenalin'], bolus: 'Emergency protocol dosing only.', monitor: 'ECG, BP, perfusion, lactate.' },
+    { generic: 'Atropine', common: 'Atropine', brands: ['Atropen'], bolus: 'Slow IV/IM per ACLS/CPR protocol.', monitor: 'HR/rhythm, anticholinergic effects.' },
+    { generic: 'Naloxone', common: 'Naloxone', brands: ['Narcan'], bolus: 'Slow IV titration to effect.', monitor: 'Respiratory drive, pain rebound.' },
+    { generic: 'Flumazenil', common: 'Flumazenil', brands: ['Romazicon'], bolus: 'Slow IV titration to effect.', monitor: 'Sedation reversal, seizure risk.' },
+    { generic: 'Calcium Gluconate', common: 'Calcium', brands: ['Calcium gluconate 10%'], bolus: 'Slow IV with ECG monitoring.', monitor: 'ECG continuously, perfusion, calcium level.' },
+    { generic: 'Mannitol', common: 'Mannitol', brands: ['Osmitrol'], bolus: 'Controlled infusion over protocol window.', monitor: 'Urine output, osmolality, volume status.' }
   ];
 
-  const guidance = {
-    'dopamine': { bolus: 'Usually CRI only; bolus generally avoided unless directed by criticalist.', monitor: 'ECG/HR, BP, perfusion, arrhythmias.' },
-    'norepinephrine': { bolus: 'Typically CRI; if bolus used, slow titrated micro-doses only per protocol.', monitor: 'Continuous BP, peripheral perfusion, arrhythmias.' },
-    'dobutamine': { bolus: 'Generally CRI, avoid bolus.', monitor: 'ECG/HR, BP, lactate/perfusion trends.' },
-    'lidocaine': { bolus: 'Give over ~1–2 min (antiarrhythmic loading per protocol).', monitor: 'ECG, neurologic signs, BP.' },
-    'regular insulin': { bolus: 'Usually no IV bolus in ICU unless specific protocol.', monitor: 'Glucose q1–2h, potassium, mentation.' },
-    'potassium chloride': { bolus: 'NEVER IV bolus.', monitor: 'ECG, infusion concentration/rate limits, serial electrolytes.' },
-    'fentanyl': { bolus: 'Slow IV over 1–2 min.', monitor: 'Respiratory rate/effort, sedation score, BP.' },
-    'hydromorphone': { bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, nausea/temperature.' },
-    'ketamine': { bolus: 'Slow IV over 1–2 min when used as bolus.', monitor: 'HR/BP, dysphoria, sedation depth.' },
-    'methadone': { bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, HR.' },
-    'midazolam': { bolus: 'Slow IV over 1–2 min.', monitor: 'Sedation, respiratory status, paradoxical excitement.' },
-    'dexmedetomidine': { bolus: 'Slow IV over 10 min or IM per protocol.', monitor: 'HR/rhythm, BP, perfusion, sedation depth.' },
-    'metronidazole': { bolus: 'Infuse slowly (usually over 20–60 min).', monitor: 'GI tolerance, neuro signs with prolonged use.' },
-    'enrofloxacin': { bolus: 'Avoid rapid IV push; slow infusion per label/protocol.', monitor: 'Site reaction, GI signs, neurologic status.' },
-    'vincristine': { bolus: 'Administer ONLY via chemo protocol (slow controlled IV).', monitor: 'Extravasation risk, CBC trend, GI signs.' },
-    'doxorubicin': { bolus: 'Use dedicated chemo protocol; avoid rapid push.', monitor: 'Extravasation, arrhythmia risk, CBC/chemistry.' },
-    'cyclophosphamide': { bolus: 'Protocol-dependent; generally controlled administration.', monitor: 'CBC, GI signs, urine/hematuria precautions.' },
-    'carboplatin': { bolus: 'Protocol-dependent infusion timing.', monitor: 'CBC (myelosuppression), renal values.' },
-    'dexamethasone sp': { bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI effects, immune suppression considerations.' },
-    'prednisolone sodium succinate': { bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI status, fluid balance.' },
-    'methylprednisolone sodium succinate': { bolus: 'Slow IV over 2–5 min.', monitor: 'BP, glucose, GI/immune effects.' },
-    'sodium bicarbonate': { bolus: 'Give slowly with protocol-guided dosing.', monitor: 'Blood gas, electrolytes (esp. ionized Ca/K), ECG.' }
-  };
+  const normalize = (s) => s.toLowerCase().trim();
+  const catalogByGeneric = new Map(drugCatalog.map((d) => [normalize(d.generic), d]));
+  const aliasToGeneric = new Map();
+
+  drugCatalog.forEach((d) => {
+    [d.generic, d.common, ...(d.brands || [])].forEach((name) => {
+      if (name) aliasToGeneric.set(normalize(name), d.generic);
+    });
+  });
 
   app.innerHTML = `
     <h2>Drug Compatibility Checker</h2>
     <section class="panel">
       <div class="form-grid">
         <div>
-          <label>Add medication (type to search)</label>
-          <input id="cmpDrugInput" class="text-input" list="cmpDrugList" placeholder="Start typing drug name..." />
+          <label>Add medication (type generic/common/brand/trade name)</label>
+          <input id="cmpDrugInput" class="text-input" list="cmpDrugList" placeholder="e.g. Baytril, Enrofloxacin, Cerenia..." />
           <datalist id="cmpDrugList">
-            ${allDrugs.map((d) => `<option value="${d}"></option>`).join('')}
+            ${drugCatalog.map((d) => `<option value="${d.generic}">${d.common} | ${(d.brands || []).join(', ')}</option>`).join('')}
+            ${drugCatalog.flatMap((d) => [d.common, ...(d.brands || [])]).filter(Boolean).map((n) => `<option value="${n}"></option>`).join('')}
           </datalist>
         </div>
         <div>
@@ -173,33 +198,38 @@ function renderCompatibility() {
   `;
 
   const incompatiblePairs = new Set([
+    'ampicillin-sulbactam|dexamethasone sp',
+    'dobutamine|sodium bicarbonate',
     'dopamine|sodium bicarbonate',
     'norepinephrine|sodium bicarbonate',
-    'dobutamine|sodium bicarbonate',
-    'ampicillin-sulbactam|dexamethasone sp',
     'pantoprazole|dexamethasone sp',
     'vincristine|doxorubicin'
   ]);
 
   const cautionPairs = new Set([
+    'cefazolin|metronidazole',
+    'cyclophosphamide|prednisolone sodium succinate',
     'dopamine|lidocaine',
-    'norepinephrine|dobutamine',
-    'regular insulin|potassium chloride',
+    'enrofloxacin|metoclopramide',
     'fentanyl|midazolam',
     'ketamine|midazolam',
-    'cefazolin|metronidazole',
-    'enrofloxacin|metoclopramide',
     'maropitant|ondansetron',
-    'cyclophosphamide|prednisolone sodium succinate'
+    'norepinephrine|dobutamine',
+    'regular insulin|potassium chloride'
   ]);
 
-  const normalize = (s) => s.toLowerCase().trim();
   const keyFor = (a, b) => [normalize(a), normalize(b)].sort().join('|');
-
   const selected = [];
   const selectedEl = document.getElementById('cmpSelected');
   const outEl = document.getElementById('cmpOut');
   const guideEl = document.getElementById('cmpGuidance');
+
+  function canonicalize(input) {
+    const raw = normalize(input || '');
+    if (!raw) return null;
+    if (catalogByGeneric.has(raw)) return catalogByGeneric.get(raw).generic;
+    return aliasToGeneric.get(raw) || null;
+  }
 
   function renderSelected() {
     if (!selected.length) {
@@ -209,7 +239,11 @@ function renderCompatibility() {
     }
 
     selectedEl.innerHTML = selected
-      .map((drug, idx) => `<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #c9d5e6;border-radius:999px;padding:4px 9px;margin:3px;">${drug} <button data-remove="${idx}" style="border:none;background:transparent;cursor:pointer;">✕</button></span>`)
+      .map((generic, idx) => {
+        const d = catalogByGeneric.get(normalize(generic));
+        const label = d ? `${d.generic} (${d.common}${d.brands?.length ? ` | ${d.brands.join(', ')}` : ''})` : generic;
+        return `<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #c9d5e6;border-radius:999px;padding:4px 9px;margin:3px;">${label} <button data-remove="${idx}" style="border:none;background:transparent;cursor:pointer;">✕</button></span>`;
+      })
       .join('');
 
     selectedEl.querySelectorAll('[data-remove]').forEach((btn) => {
@@ -219,21 +253,20 @@ function renderCompatibility() {
       });
     });
 
-    guideEl.innerHTML = '<strong>Bolus / Monitoring Guidance:</strong>' + selected.map((drug) => {
-      const info = guidance[normalize(drug)] || { bolus: 'No guidance loaded yet for this drug.', monitor: 'Use hospital protocol and monitor patient closely.' };
-      return `<div style="margin-top:8px;"><strong>${drug}</strong><br><em>Bolus/Rate:</em> ${info.bolus}<br><em>Monitoring:</em> ${info.monitor}</div>`;
+    guideEl.innerHTML = '<strong>Bolus / Monitoring Guidance:</strong>' + selected.map((generic) => {
+      const d = catalogByGeneric.get(normalize(generic));
+      if (!d) return '';
+      return `<div style="margin-top:8px;"><strong>${d.generic}</strong> <span style="color:#60718a;">(${d.common}${d.brands?.length ? ` | ${d.brands.join(', ')}` : ''})</span><br><em>Bolus/Rate:</em> ${d.bolus}<br><em>Monitoring:</em> ${d.monitor}</div>`;
     }).join('');
   }
 
   document.getElementById('cmpAddDrug').addEventListener('click', () => {
     const input = document.getElementById('cmpDrugInput');
-    const value = (input.value || '').trim();
-    if (!value) return;
-    if (!allDrugs.some((d) => normalize(d) === normalize(value))) {
-      outEl.innerHTML = '<div class="warn">Drug not in current list. Pick from suggestions (auto-fill list).</div>';
+    const canonical = canonicalize(input.value);
+    if (!canonical) {
+      outEl.innerHTML = '<div class="warn">Drug not recognized. Type a generic/common/brand name from suggestions.</div>';
       return;
     }
-    const canonical = allDrugs.find((d) => normalize(d) === normalize(value));
     if (!selected.some((d) => normalize(d) === normalize(canonical))) selected.push(canonical);
     input.value = '';
     renderSelected();
