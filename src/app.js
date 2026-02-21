@@ -240,122 +240,48 @@ function renderCompatibility() {
     </section>
   `;
 
-  const pairRules = {
-    'ampicillin-sulbactam|dexamethasone sp': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Reported pH/solution instability concern in co-line setups.',
-      recommendation: 'Use separate lines/lumens.'
-    },
-    'dobutamine|sodium bicarbonate': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Catecholamine degradation risk in alkaline conditions.',
-      recommendation: 'Do not co-infuse via same line.'
-    },
-    'dopamine|sodium bicarbonate': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Catecholamine degradation risk in alkaline conditions.',
-      recommendation: 'Do not co-infuse via same line.'
-    },
-    'norepinephrine|sodium bicarbonate': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Catecholamine degradation risk in alkaline conditions.',
-      recommendation: 'Do not co-infuse via same line.'
-    },
-    'pantoprazole|dexamethasone sp': {
-      level: 'incompatible', evidence: 'moderate',
-      reason: 'Potential pH-driven instability depending on concentration/formulation.',
-      recommendation: 'Use separate lumen; verify compounding reference.'
-    },
-    'potassium phosphate|calcium gluconate': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Calcium-phosphate precipitation risk.',
-      recommendation: 'Do not co-infuse in same line.'
-    },
-    'potassium phosphate|calcium chloride': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Calcium-phosphate precipitation risk.',
-      recommendation: 'Do not co-infuse in same line.'
-    },
-    'vincristine|doxorubicin': {
-      level: 'incompatible', evidence: 'strong',
-      reason: 'Operationally high-risk chemotherapy combination in shared line context.',
-      recommendation: 'Separate chemo administration pathway only.'
-    },
+  // Structured compatibility matrix seed (pairwise only)
+  const compatibilityMatrix = [
+    { a: 'Ampicillin-Sulbactam', b: 'Dexamethasone SP', level: 'incompatible', evidence: 'strong', reason: 'Reported pH/solution instability concern in co-line setups.', recommendation: 'Use separate lines/lumens.', reference: 'Thames Valley 2011 / Trissel' },
+    { a: 'Dobutamine', b: 'Sodium Bicarbonate', level: 'incompatible', evidence: 'strong', reason: 'Catecholamine degradation risk in alkaline conditions.', recommendation: 'Do not co-infuse via same line.', reference: 'Thames Valley 2011' },
+    { a: 'Dopamine', b: 'Sodium Bicarbonate', level: 'incompatible', evidence: 'strong', reason: 'Catecholamine degradation risk in alkaline conditions.', recommendation: 'Do not co-infuse via same line.', reference: 'Thames Valley 2011' },
+    { a: 'Norepinephrine', b: 'Sodium Bicarbonate', level: 'incompatible', evidence: 'strong', reason: 'Catecholamine degradation risk in alkaline conditions.', recommendation: 'Do not co-infuse via same line.', reference: 'Thames Valley 2011' },
+    { a: 'Pantoprazole', b: 'Dexamethasone SP', level: 'incompatible', evidence: 'moderate', reason: 'Potential pH-driven instability depending on concentration/formulation.', recommendation: 'Use separate lumen; verify compounding reference.', reference: 'Thames Valley 2011 / local rule' },
+    { a: 'Potassium Phosphate', b: 'Calcium Gluconate', level: 'incompatible', evidence: 'strong', reason: 'Calcium-phosphate precipitation risk.', recommendation: 'Do not co-infuse in same line.', reference: 'Core IV compatibility principle' },
+    { a: 'Potassium Phosphate', b: 'Calcium Chloride', level: 'incompatible', evidence: 'strong', reason: 'Calcium-phosphate precipitation risk.', recommendation: 'Do not co-infuse in same line.', reference: 'Core IV compatibility principle' },
+    { a: 'Vincristine', b: 'Doxorubicin', level: 'incompatible', evidence: 'strong', reason: 'Operationally high-risk chemotherapy combination in shared line context.', recommendation: 'Separate chemo administration pathway only.', reference: 'Oncology handling policy' },
 
-    'cefazolin|metronidazole': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Condition-dependent compatibility in some settings.',
-      recommendation: 'Verify concentrations and Y-site reference before co-infusion.'
-    },
-    'cyclophosphamide|prednisolone sodium succinate': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Compatibility may vary by product/formulation.',
-      recommendation: 'Prefer separate lumen when feasible.'
-    },
-    'dopamine|lidocaine': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Some references report condition-specific results only.',
-      recommendation: 'Use caution; verify before shared line.'
-    },
-    'enrofloxacin|metoclopramide': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Potential compatibility variability with concentration/vehicle.',
-      recommendation: 'Prefer separate line if uncertain.'
-    },
-    'fentanyl|midazolam': {
-      level: 'caution', evidence: 'moderate',
-      reason: 'Often used together but still concentration/formulation dependent.',
-      recommendation: 'Accept with protocol + monitor line clarity/response.'
-    },
-    'ketamine|midazolam': {
-      level: 'caution', evidence: 'moderate',
-      reason: 'Common combination but depends on prep parameters.',
-      recommendation: 'Use protocol concentrations and verify policy.'
-    },
-    'maropitant|ondansetron': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Data may be incomplete for all concentrations/formulations.',
-      recommendation: 'Check current compatibility source before Y-site.'
-    },
-    'norepinephrine|dobutamine': {
-      level: 'caution', evidence: 'moderate',
-      reason: 'Concurrent use common but requires protocolized line management.',
-      recommendation: 'Confirm concentration compatibility and monitor closely.'
-    },
-    'regular insulin|potassium chloride': {
-      level: 'caution', evidence: 'moderate',
-      reason: 'Frequent co-therapy; line compatibility depends on dilution/setup.',
-      recommendation: 'Use standardized ICU protocol and close monitoring.'
-    },
+    { a: 'Cefazolin', b: 'Metronidazole', level: 'caution', evidence: 'limited', reason: 'Condition-dependent compatibility in some settings.', recommendation: 'Verify concentrations and Y-site reference before co-infusion.', reference: 'Thames Valley 2011' },
+    { a: 'Cyclophosphamide', b: 'Prednisolone Sodium Succinate', level: 'caution', evidence: 'limited', reason: 'Compatibility may vary by product/formulation.', recommendation: 'Prefer separate lumen when feasible.', reference: 'Prototype rule' },
+    { a: 'Dopamine', b: 'Lidocaine', level: 'caution', evidence: 'limited', reason: 'Some references report condition-specific results only.', recommendation: 'Use caution; verify before shared line.', reference: 'Thames Valley 2011' },
+    { a: 'Enrofloxacin', b: 'Metoclopramide', level: 'caution', evidence: 'limited', reason: 'Potential compatibility variability with concentration/vehicle.', recommendation: 'Prefer separate line if uncertain.', reference: 'Prototype rule' },
+    { a: 'Fentanyl', b: 'Midazolam', level: 'caution', evidence: 'moderate', reason: 'Often used together but still concentration/formulation dependent.', recommendation: 'Accept with protocol + monitor line clarity/response.', reference: 'Thames Valley 2011 + ICU practice' },
+    { a: 'Ketamine', b: 'Midazolam', level: 'caution', evidence: 'moderate', reason: 'Common combination but depends on prep parameters.', recommendation: 'Use protocol concentrations and verify policy.', reference: 'ICU protocol pattern' },
+    { a: 'Maropitant', b: 'Ondansetron', level: 'caution', evidence: 'limited', reason: 'Data may be incomplete for all concentrations/formulations.', recommendation: 'Check current compatibility source before Y-site.', reference: 'Prototype rule' },
+    { a: 'Norepinephrine', b: 'Dobutamine', level: 'caution', evidence: 'moderate', reason: 'Concurrent use common but requires protocolized line management.', recommendation: 'Confirm concentration compatibility and monitor closely.', reference: 'Thames Valley 2011 / ICU practice' },
+    { a: 'Regular Insulin', b: 'Potassium Chloride', level: 'caution', evidence: 'moderate', reason: 'Frequent co-therapy; line compatibility depends on dilution/setup.', recommendation: 'Use standardized ICU protocol and close monitoring.', reference: 'ICU protocol pattern' },
 
-    'magnesium sulfate|enrofloxacin': {
-      level: 'limited', evidence: 'limited',
-      reason: 'Conflicting/insufficient compatibility evidence reported.',
-      recommendation: 'Avoid shared line when possible; separate lumen preferred.'
-    },
-    'magnesium sulfate|sodium bicarbonate': {
-      level: 'limited', evidence: 'limited',
-      reason: 'Potential precipitation/instability concern reported in some references.',
-      recommendation: 'Prefer separate lumen; verify Y-site data at actual concentrations.'
-    },
-    'omeprazole|vancomycin': {
-      level: 'limited', evidence: 'limited',
-      reason: 'pH-related compatibility concerns noted for omeprazole with some co-infusions.',
-      recommendation: 'Avoid shared line unless compatibility explicitly confirmed.'
-    },
-    'propofol|vancomycin': {
-      level: 'limited', evidence: 'limited',
-      reason: 'Emulsion compatibility may vary by formulation/line conditions.',
-      recommendation: 'Use separate lumen when possible.'
-    },
-    'thiopental|sodium bicarbonate': {
-      level: 'caution', evidence: 'limited',
-      reason: 'Alkaline chemistry/physical instability concerns in mixed conditions.',
-      recommendation: 'Check protocol and avoid unnecessary line co-mingling.'
-    }
-  };
+    { a: 'Magnesium Sulfate', b: 'Enrofloxacin', level: 'limited', evidence: 'limited', reason: 'Conflicting/insufficient compatibility evidence reported.', recommendation: 'Avoid shared line when possible; separate lumen preferred.', reference: 'User-flagged + limited sources' },
+    { a: 'Magnesium Sulfate', b: 'Sodium Bicarbonate', level: 'limited', evidence: 'limited', reason: 'Potential precipitation/instability concern reported in some references.', recommendation: 'Prefer separate lumen; verify Y-site data at actual concentrations.', reference: 'Thames Valley pattern + local caution' },
+    { a: 'Omeprazole', b: 'Vancomycin', level: 'limited', evidence: 'limited', reason: 'pH-related compatibility concerns noted for omeprazole with some co-infusions.', recommendation: 'Avoid shared line unless compatibility explicitly confirmed.', reference: 'Thames Valley pattern + local caution' },
+    { a: 'Propofol', b: 'Vancomycin', level: 'limited', evidence: 'limited', reason: 'Emulsion compatibility may vary by formulation/line conditions.', recommendation: 'Use separate lumen when possible.', reference: 'Prototype rule' },
+    { a: 'Thiopental', b: 'Sodium Bicarbonate', level: 'caution', evidence: 'limited', reason: 'Alkaline chemistry/physical instability concerns in mixed conditions.', recommendation: 'Check protocol and avoid unnecessary line co-mingling.', reference: 'Thames Valley pattern' }
+  ];
 
   const keyFor = (a, b) => [normalize(a), normalize(b)].sort().join('|');
+  const pairRules = Object.fromEntries(
+    compatibilityMatrix.map((r) => [
+      keyFor(r.a, r.b),
+      {
+        level: r.level,
+        evidence: r.evidence,
+        reason: r.reason,
+        recommendation: r.recommendation,
+        reference: r.reference
+      }
+    ])
+  );
+
   const getPairRule = (a, b) => pairRules[keyFor(a, b)] || null;
   const selected = [];
   const selectedEl = document.getElementById('cmpSelected');
@@ -443,23 +369,23 @@ function renderCompatibility() {
 
         if (rule.level === 'incompatible') {
           red += 1;
-          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           continue;
         }
 
         if (rule.level === 'limited') {
           if (policy === 'conservative') {
             red += 1;
-            rows.push(`<div class="status-card status-red"><strong>LIMITED EVIDENCE (Conservative Policy => Treat as INCOMPATIBLE)</strong> — ${a} + ${b}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+            rows.push(`<div class="status-card status-red"><strong>LIMITED EVIDENCE (Conservative Policy => Treat as INCOMPATIBLE)</strong> — ${a} + ${b}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           } else {
             yellow += 1;
-            rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING / LIMITED DATA</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+            rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING / LIMITED DATA</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
           }
           continue;
         }
 
         yellow += 1;
-        rows.push(`<div class="status-card status-yellow"><strong>USE CAUTION</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}</div>`);
+        rows.push(`<div class="status-card status-yellow"><strong>USE CAUTION</strong> — ${a} + ${b}<br><strong>Evidence:</strong> ${rule.evidence}<br>${rule.reason}<br><strong>Action:</strong> ${rule.recommendation}${rule.reference ? `<br><strong>Reference:</strong> ${rule.reference}` : ''}</div>`);
       }
     }
     const fluidNote = fluid === 'lrs'
