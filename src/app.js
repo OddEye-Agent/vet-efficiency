@@ -104,35 +104,32 @@ function renderCri() {
 }
 
 function renderCompatibility() {
+  const drugGroups = {
+    'CRI / Vasoactive': ['Dopamine', 'Norepinephrine', 'Dobutamine', 'Lidocaine', 'Regular Insulin', 'Potassium Chloride'],
+    Antibiotics: ['Ampicillin-Sulbactam', 'Cefazolin', 'Ceftriaxone', 'Enrofloxacin', 'Metronidazole', 'Piperacillin-Tazobactam'],
+    'Pain / Sedation': ['Fentanyl', 'Hydromorphone', 'Ketamine', 'Methadone', 'Midazolam', 'Dexmedetomidine'],
+    'GI / Supportive': ['Maropitant', 'Ondansetron', 'Pantoprazole', 'Famotidine', 'Metoclopramide', 'Lactulose'],
+    Chemo: ['Vincristine', 'Cyclophosphamide', 'Doxorubicin', 'Lomustine', 'Carboplatin'],
+    Steroids: ['Dexamethasone SP', 'Prednisolone Sodium Succinate', 'Methylprednisolone Sodium Succinate'],
+    Other: ['Sodium Bicarbonate']
+  };
+
+  const renderOptions = () =>
+    Object.entries(drugGroups)
+      .map(([group, items]) => `<optgroup label="${group}">${items.map((d) => `<option>${d}</option>`).join('')}</optgroup>`)
+      .join('');
+
   app.innerHTML = `
     <h2>Drug Compatibility Checker</h2>
     <section class="panel">
       <div class="form-grid">
         <div>
-          <label>Primary Infusion</label>
-          <select id="cmpA">
-            <option>Dopamine</option>
-            <option>Norepinephrine</option>
-            <option>Dobutamine</option>
-            <option>Lidocaine</option>
-            <option>Fentanyl</option>
-            <option>Midazolam</option>
-            <option>Regular Insulin</option>
-            <option>Potassium Chloride</option>
-          </select>
+          <label>Primary Medication / Infusion</label>
+          <select id="cmpA">${renderOptions()}</select>
         </div>
         <div>
-          <label>Secondary Infusion</label>
-          <select id="cmpB">
-            <option>Norepinephrine</option>
-            <option>Dopamine</option>
-            <option>Dobutamine</option>
-            <option>Lidocaine</option>
-            <option>Fentanyl</option>
-            <option>Midazolam</option>
-            <option>Regular Insulin</option>
-            <option>Potassium Chloride</option>
-          </select>
+          <label>Secondary Medication / Infusion</label>
+          <select id="cmpB">${renderOptions()}</select>
         </div>
         <div>
           <label>Carrier Fluid</label>
@@ -144,7 +141,7 @@ function renderCompatibility() {
         </div>
       </div>
       <div class="actions"><button class="primary" id="cmpCheck">Check Compatibility</button></div>
-      <div class="result" id="cmpOut">Select drugs and check compatibility.</div>
+      <div class="result" id="cmpOut">Select two medications and check compatibility.</div>
     </section>
   `;
 
@@ -152,14 +149,21 @@ function renderCompatibility() {
     'dopamine|sodium bicarbonate',
     'norepinephrine|sodium bicarbonate',
     'dobutamine|sodium bicarbonate',
-    'potassium chloride|midazolam'
+    'ampicillin-sulbactam|dexamethasone sp',
+    'pantoprazole|dexamethasone sp',
+    'vincristine|doxorubicin'
   ]);
 
   const cautionPairs = new Set([
     'dopamine|lidocaine',
     'norepinephrine|dobutamine',
     'regular insulin|potassium chloride',
-    'fentanyl|midazolam'
+    'fentanyl|midazolam',
+    'ketamine|midazolam',
+    'cefazolin|metronidazole',
+    'enrofloxacin|metoclopramide',
+    'maropitant|ondansetron',
+    'cyclophosphamide|prednisolone sodium succinate'
   ]);
 
   const normalize = (s) => s.toLowerCase().trim();
@@ -176,27 +180,27 @@ function renderCompatibility() {
     const out = document.getElementById('cmpOut');
 
     if (normalize(a) === normalize(b)) {
-      out.innerHTML = '<div class="warn">Select two different infusions to compare.</div>';
+      out.innerHTML = '<div class="warn">Select two different medications to compare.</div>';
       return;
     }
 
     const key = keyFor(a, b);
 
     if (incompatiblePairs.has(key)) {
-      out.innerHTML = `<div class="warn"><strong>Result: Incompatible</strong><br>${a} + ${b} should not run together in the same line. Use separate lumens/lines.</div>`;
+      out.innerHTML = `<div class="warn"><strong>Result: Incompatible</strong><br>${a} + ${b} should not run together in the same line. Use separate lumens/lines and verify institutional policy.</div>`;
       return;
     }
 
     let cautionText = '';
     if (cautionPairs.has(key)) {
-      cautionText = `<div class="warn"><strong>Caution:</strong> ${a} + ${b} may be conditionally compatible depending on concentration, line contact time, and formulation. Verify with pharmacy/reference before Y-site co-infusion.</div>`;
+      cautionText = `<div class="warn"><strong>Caution:</strong> ${a} + ${b} may be conditionally compatible depending on concentration, contact time, and formulation. Verify with pharmacy/reference before Y-site co-infusion.</div>`;
     }
 
     const fluidNote = fluid === 'lrs'
       ? 'LRS selected: confirm compatibility for each medication with calcium-containing fluids.'
       : fluid === 'd5'
         ? 'D5W selected: confirm drug stability in dextrose-containing fluids.'
-        : '0.9% NaCl selected: generally preferred for many vasopressor infusions.';
+        : '0.9% NaCl selected: generally preferred for many continuous infusions.';
 
     out.innerHTML = `
       <div><strong>Result:</strong> No hard conflict detected for this pair in current prototype rules.</div>
