@@ -104,32 +104,51 @@ function renderCri() {
 }
 
 function renderCompatibility() {
-  const drugGroups = {
-    'CRI / Vasoactive': ['Dopamine', 'Norepinephrine', 'Dobutamine', 'Lidocaine', 'Regular Insulin', 'Potassium Chloride'],
-    Antibiotics: ['Ampicillin-Sulbactam', 'Cefazolin', 'Ceftriaxone', 'Enrofloxacin', 'Metronidazole', 'Piperacillin-Tazobactam'],
-    'Pain / Sedation': ['Fentanyl', 'Hydromorphone', 'Ketamine', 'Methadone', 'Midazolam', 'Dexmedetomidine'],
-    'GI / Supportive': ['Maropitant', 'Ondansetron', 'Pantoprazole', 'Famotidine', 'Metoclopramide', 'Lactulose'],
-    Chemo: ['Vincristine', 'Cyclophosphamide', 'Doxorubicin', 'Lomustine', 'Carboplatin'],
-    Steroids: ['Dexamethasone SP', 'Prednisolone Sodium Succinate', 'Methylprednisolone Sodium Succinate'],
-    Other: ['Sodium Bicarbonate']
-  };
+  const allDrugs = [
+    'Dopamine', 'Norepinephrine', 'Dobutamine', 'Lidocaine', 'Regular Insulin', 'Potassium Chloride',
+    'Ampicillin-Sulbactam', 'Cefazolin', 'Ceftriaxone', 'Enrofloxacin', 'Metronidazole', 'Piperacillin-Tazobactam',
+    'Fentanyl', 'Hydromorphone', 'Ketamine', 'Methadone', 'Midazolam', 'Dexmedetomidine',
+    'Maropitant', 'Ondansetron', 'Pantoprazole', 'Famotidine', 'Metoclopramide', 'Lactulose',
+    'Vincristine', 'Cyclophosphamide', 'Doxorubicin', 'Lomustine', 'Carboplatin',
+    'Dexamethasone SP', 'Prednisolone Sodium Succinate', 'Methylprednisolone Sodium Succinate',
+    'Sodium Bicarbonate'
+  ];
 
-  const renderOptions = () =>
-    Object.entries(drugGroups)
-      .map(([group, items]) => `<optgroup label="${group}">${items.map((d) => `<option>${d}</option>`).join('')}</optgroup>`)
-      .join('');
+  const guidance = {
+    'dopamine': { bolus: 'Usually CRI only; bolus generally avoided unless directed by criticalist.', monitor: 'ECG/HR, BP, perfusion, arrhythmias.' },
+    'norepinephrine': { bolus: 'Typically CRI; if bolus used, slow titrated micro-doses only per protocol.', monitor: 'Continuous BP, peripheral perfusion, arrhythmias.' },
+    'dobutamine': { bolus: 'Generally CRI, avoid bolus.', monitor: 'ECG/HR, BP, lactate/perfusion trends.' },
+    'lidocaine': { bolus: 'Give over ~1–2 min (antiarrhythmic loading per protocol).', monitor: 'ECG, neurologic signs, BP.' },
+    'regular insulin': { bolus: 'Usually no IV bolus in ICU unless specific protocol.', monitor: 'Glucose q1–2h, potassium, mentation.' },
+    'potassium chloride': { bolus: 'NEVER IV bolus.', monitor: 'ECG, infusion concentration/rate limits, serial electrolytes.' },
+    'fentanyl': { bolus: 'Slow IV over 1–2 min.', monitor: 'Respiratory rate/effort, sedation score, BP.' },
+    'hydromorphone': { bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, nausea/temperature.' },
+    'ketamine': { bolus: 'Slow IV over 1–2 min when used as bolus.', monitor: 'HR/BP, dysphoria, sedation depth.' },
+    'methadone': { bolus: 'Slow IV over 2–3 min.', monitor: 'Respiratory status, sedation, HR.' },
+    'midazolam': { bolus: 'Slow IV over 1–2 min.', monitor: 'Sedation, respiratory status, paradoxical excitement.' },
+    'dexmedetomidine': { bolus: 'Slow IV over 10 min or IM per protocol.', monitor: 'HR/rhythm, BP, perfusion, sedation depth.' },
+    'metronidazole': { bolus: 'Infuse slowly (usually over 20–60 min).', monitor: 'GI tolerance, neuro signs with prolonged use.' },
+    'enrofloxacin': { bolus: 'Avoid rapid IV push; slow infusion per label/protocol.', monitor: 'Site reaction, GI signs, neurologic status.' },
+    'vincristine': { bolus: 'Administer ONLY via chemo protocol (slow controlled IV).', monitor: 'Extravasation risk, CBC trend, GI signs.' },
+    'doxorubicin': { bolus: 'Use dedicated chemo protocol; avoid rapid push.', monitor: 'Extravasation, arrhythmia risk, CBC/chemistry.' },
+    'cyclophosphamide': { bolus: 'Protocol-dependent; generally controlled administration.', monitor: 'CBC, GI signs, urine/hematuria precautions.' },
+    'carboplatin': { bolus: 'Protocol-dependent infusion timing.', monitor: 'CBC (myelosuppression), renal values.' },
+    'dexamethasone sp': { bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI effects, immune suppression considerations.' },
+    'prednisolone sodium succinate': { bolus: 'Slow IV over 2–5 min.', monitor: 'Glucose, GI status, fluid balance.' },
+    'methylprednisolone sodium succinate': { bolus: 'Slow IV over 2–5 min.', monitor: 'BP, glucose, GI/immune effects.' },
+    'sodium bicarbonate': { bolus: 'Give slowly with protocol-guided dosing.', monitor: 'Blood gas, electrolytes (esp. ionized Ca/K), ECG.' }
+  };
 
   app.innerHTML = `
     <h2>Drug Compatibility Checker</h2>
     <section class="panel">
       <div class="form-grid">
         <div>
-          <label>Primary Medication / Infusion</label>
-          <select id="cmpA">${renderOptions()}</select>
-        </div>
-        <div>
-          <label>Secondary Medication / Infusion</label>
-          <select id="cmpB">${renderOptions()}</select>
+          <label>Add medication (type to search)</label>
+          <input id="cmpDrugInput" class="text-input" list="cmpDrugList" placeholder="Start typing drug name..." />
+          <datalist id="cmpDrugList">
+            ${allDrugs.map((d) => `<option value="${d}"></option>`).join('')}
+          </datalist>
         </div>
         <div>
           <label>Carrier Fluid</label>
@@ -140,8 +159,16 @@ function renderCompatibility() {
           </select>
         </div>
       </div>
-      <div class="actions"><button class="primary" id="cmpCheck">Check Compatibility</button></div>
-      <div class="result" id="cmpOut">Select two medications and check compatibility.</div>
+
+      <div class="actions">
+        <button class="primary" id="cmpAddDrug">Add Drug</button>
+        <button id="cmpCheck">Check All Compatibility</button>
+        <button id="cmpClear">Clear</button>
+      </div>
+
+      <div id="cmpSelected" class="result">No drugs selected yet.</div>
+      <div class="result" id="cmpOut">Add at least two drugs to run a compatibility check.</div>
+      <div class="result" id="cmpGuidance">Bolus/monitoring guidance will appear for selected drugs.</div>
     </section>
   `;
 
@@ -167,48 +194,90 @@ function renderCompatibility() {
   ]);
 
   const normalize = (s) => s.toLowerCase().trim();
-  const keyFor = (a, b) => {
-    const x = normalize(a);
-    const y = normalize(b);
-    return [x, y].sort().join('|');
-  };
+  const keyFor = (a, b) => [normalize(a), normalize(b)].sort().join('|');
+
+  const selected = [];
+  const selectedEl = document.getElementById('cmpSelected');
+  const outEl = document.getElementById('cmpOut');
+  const guideEl = document.getElementById('cmpGuidance');
+
+  function renderSelected() {
+    if (!selected.length) {
+      selectedEl.textContent = 'No drugs selected yet.';
+      guideEl.textContent = 'Bolus/monitoring guidance will appear for selected drugs.';
+      return;
+    }
+
+    selectedEl.innerHTML = selected
+      .map((drug, idx) => `<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #c9d5e6;border-radius:999px;padding:4px 9px;margin:3px;">${drug} <button data-remove="${idx}" style="border:none;background:transparent;cursor:pointer;">✕</button></span>`)
+      .join('');
+
+    selectedEl.querySelectorAll('[data-remove]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        selected.splice(Number(btn.dataset.remove), 1);
+        renderSelected();
+      });
+    });
+
+    guideEl.innerHTML = '<strong>Bolus / Monitoring Guidance:</strong>' + selected.map((drug) => {
+      const info = guidance[normalize(drug)] || { bolus: 'No guidance loaded yet for this drug.', monitor: 'Use hospital protocol and monitor patient closely.' };
+      return `<div style="margin-top:8px;"><strong>${drug}</strong><br><em>Bolus/Rate:</em> ${info.bolus}<br><em>Monitoring:</em> ${info.monitor}</div>`;
+    }).join('');
+  }
+
+  document.getElementById('cmpAddDrug').addEventListener('click', () => {
+    const input = document.getElementById('cmpDrugInput');
+    const value = (input.value || '').trim();
+    if (!value) return;
+    if (!allDrugs.some((d) => normalize(d) === normalize(value))) {
+      outEl.innerHTML = '<div class="warn">Drug not in current list. Pick from suggestions (auto-fill list).</div>';
+      return;
+    }
+    const canonical = allDrugs.find((d) => normalize(d) === normalize(value));
+    if (!selected.some((d) => normalize(d) === normalize(canonical))) selected.push(canonical);
+    input.value = '';
+    renderSelected();
+  });
+
+  document.getElementById('cmpClear').addEventListener('click', () => {
+    selected.length = 0;
+    outEl.textContent = 'Add at least two drugs to run a compatibility check.';
+    renderSelected();
+  });
 
   document.getElementById('cmpCheck').addEventListener('click', () => {
-    const a = document.getElementById('cmpA').value;
-    const b = document.getElementById('cmpB').value;
     const fluid = document.getElementById('cmpFluid').value;
-    const out = document.getElementById('cmpOut');
-
-    if (normalize(a) === normalize(b)) {
-      out.innerHTML = '<div class="warn">Select two different medications to compare.</div>';
+    if (selected.length < 2) {
+      outEl.innerHTML = '<div class="warn">Add at least two drugs to compare.</div>';
       return;
     }
 
-    const key = keyFor(a, b);
-
-    if (incompatiblePairs.has(key)) {
-      out.innerHTML = `<div class="warn"><strong>Result: Incompatible</strong><br>${a} + ${b} should not run together in the same line. Use separate lumens/lines and verify institutional policy.</div>`;
-      return;
-    }
-
-    let cautionText = '';
-    if (cautionPairs.has(key)) {
-      cautionText = `<div class="warn"><strong>Caution:</strong> ${a} + ${b} may be conditionally compatible depending on concentration, contact time, and formulation. Verify with pharmacy/reference before Y-site co-infusion.</div>`;
+    const results = [];
+    for (let i = 0; i < selected.length; i++) {
+      for (let j = i + 1; j < selected.length; j++) {
+        const a = selected[i];
+        const b = selected[j];
+        const key = keyFor(a, b);
+        if (incompatiblePairs.has(key)) {
+          results.push(`<div class="warn"><strong>Incompatible:</strong> ${a} + ${b} — use separate lines/lumens.</div>`);
+        } else if (cautionPairs.has(key)) {
+          results.push(`<div class="warn"><strong>Caution:</strong> ${a} + ${b} — conditionally compatible; verify concentration/reference.</div>`);
+        } else {
+          results.push(`<div><strong>OK (no hard conflict in prototype rules):</strong> ${a} + ${b}</div>`);
+        }
+      }
     }
 
     const fluidNote = fluid === 'lrs'
-      ? 'LRS selected: confirm compatibility for each medication with calcium-containing fluids.'
+      ? 'Fluid note: LRS contains calcium; verify compatibility carefully.'
       : fluid === 'd5'
-        ? 'D5W selected: confirm drug stability in dextrose-containing fluids.'
-        : '0.9% NaCl selected: generally preferred for many continuous infusions.';
+        ? 'Fluid note: D5W may alter stability for some medications.'
+        : 'Fluid note: 0.9% NaCl is commonly preferred for many ICU infusions.';
 
-    out.innerHTML = `
-      <div><strong>Result:</strong> No hard conflict detected for this pair in current prototype rules.</div>
-      <div style="margin-top:6px"><strong>Fluid check:</strong> ${fluidNote}</div>
-      ${cautionText}
-      <div style="margin-top:8px">Always confirm against your hospital formulary and a current compatibility reference before bedside administration.</div>
-    `;
+    outEl.innerHTML = `${results.join('')}<div style="margin-top:8px"><strong>${fluidNote}</strong><br>Always verify with hospital formulary + current compatibility reference before administration.</div>`;
   });
+
+  renderSelected();
 }
 
 function renderView(view) {
