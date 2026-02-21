@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vet Efficiency</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Vet Efficiency</h1>
+    <p>Clinical workflow support tools</p>
+  </header>
+
+  <nav class="menu" aria-label="Primary">
+    <button class="menu-item active" data-view="dashboard">Dashboard</button>
+    <button class="menu-item" data-view="transfusion">Transfusion Volume</button>
+    <button class="menu-item" data-view="rounding">UCI Rounding Sheet</button>
+    <button class="menu-item" data-view="cri">CRI Safety</button>
+  </nav>
+
+  <main id="app" class="app"></main>
+
+  <script src="./src/app.js"></script>
+</body>
+</html>
