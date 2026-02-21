@@ -213,6 +213,7 @@ function renderCompatibility() {
     'enrofloxacin|metoclopramide',
     'fentanyl|midazolam',
     'ketamine|midazolam',
+    'magnesium sulfate|enrofloxacin',
     'maropitant|ondansetron',
     'norepinephrine|dobutamine',
     'regular insulin|potassium chloride'
@@ -281,33 +282,56 @@ function renderCompatibility() {
   document.getElementById('cmpCheck').addEventListener('click', () => {
     const fluid = document.getElementById('cmpFluid').value;
     if (selected.length < 2) {
-      outEl.innerHTML = '<div class="warn">Add at least two drugs to compare.</div>';
+      outEl.innerHTML = '<div class="status-card status-red">Add at least two drugs to compare.</div>';
       return;
     }
 
-    const results = [];
+    const rows = [];
+    let red = 0;
+    let yellow = 0;
+    let green = 0;
+
     for (let i = 0; i < selected.length; i++) {
       for (let j = i + 1; j < selected.length; j++) {
         const a = selected[i];
         const b = selected[j];
         const key = keyFor(a, b);
+
         if (incompatiblePairs.has(key)) {
-          results.push(`<div class="warn"><strong>Incompatible:</strong> ${a} + ${b} — use separate lines/lumens.</div>`);
+          red += 1;
+          rows.push(`<div class="status-card status-red"><strong>INCOMPATIBLE</strong> — ${a} + ${b}<br>Use separate lines/lumens.</div>`);
         } else if (cautionPairs.has(key)) {
-          results.push(`<div class="warn"><strong>Caution:</strong> ${a} + ${b} — conditionally compatible; verify concentration/reference.</div>`);
+          yellow += 1;
+          const reason = key === 'magnesium sulfate|enrofloxacin'
+            ? 'Conflicting/limited compatibility evidence in some settings.'
+            : 'Conditionally compatible depending on concentration/contact time.';
+          rows.push(`<div class="status-card status-yellow"><strong>CONFLICTING DATA / CAUTION</strong> — ${a} + ${b}<br>${reason} Verify reference/pharmacy before Y-site co-infusion.</div>`);
         } else {
-          results.push(`<div><strong>OK (no hard conflict in prototype rules):</strong> ${a} + ${b}</div>`);
+          green += 1;
+          rows.push(`<div class="status-card status-green"><strong>COMPATIBLE (prototype rule)</strong> — ${a} + ${b}</div>`);
         }
       }
     }
 
     const fluidNote = fluid === 'lrs'
-      ? 'Fluid note: LRS contains calcium; verify compatibility carefully.'
+      ? 'LRS selected: calcium-containing fluid can change compatibility for some drugs.'
       : fluid === 'd5'
-        ? 'Fluid note: D5W may alter stability for some medications.'
-        : 'Fluid note: 0.9% NaCl is commonly preferred for many ICU infusions.';
+        ? 'D5W selected: dextrose vehicle may alter stability for some medications.'
+        : '0.9% NaCl selected: often preferred for many ICU infusions.';
 
-    outEl.innerHTML = `${results.join('')}<div style="margin-top:8px"><strong>${fluidNote}</strong><br>Always verify with hospital formulary + current compatibility reference before administration.</div>`;
+    const overall = red > 0
+      ? `<div class="status-card status-red"><strong>Overall Outcome: HIGH RISK</strong> — ${red} incompatible pair(s), ${yellow} caution pair(s), ${green} prototype-compatible pair(s).</div>`
+      : yellow > 0
+        ? `<div class="status-card status-yellow"><strong>Overall Outcome: USE CAUTION</strong> — ${yellow} conflicting/caution pair(s), ${green} prototype-compatible pair(s).</div>`
+        : `<div class="status-card status-green"><strong>Overall Outcome: NO CONFLICTS FOUND IN PROTOTYPE RULES</strong> — ${green} pair(s) checked.</div>`;
+
+    outEl.innerHTML = `
+      ${overall}
+      <div class="status-summary">Checked ${selected.length} drugs (${(selected.length * (selected.length - 1)) / 2} pairings).</div>
+      ${rows.join('')}
+      <div class="status-summary"><strong>Fluid Note:</strong> ${fluidNote}</div>
+      <div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
+    `;
   });
 
   renderSelected();

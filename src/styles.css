@@ -18,3 +18,8 @@ textarea { min-height: 120px; }
 button.primary { background: #1f57d6; color: #fff; border: 1px solid #1f57d6; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
 .result { margin-top: 10px; border: 1px solid #d8dfeb; border-radius: 6px; padding: 10px; background: #f8fbff; }
 .warn { margin-top: 8px; border: 1px solid #f0c5a5; background: #fff6ef; color: #7a3d25; padding: 8px; border-radius: 6px; }
+.status-card { margin-top: 8px; border-radius: 6px; padding: 8px; border: 1px solid; }
+.status-green { border-color: #b9e8c8; background: #eefcf2; color: #1e6a3f; }
+.status-red { border-color: #efb5b5; background: #fff0f0; color: #8b1f1f; }
+.status-yellow { border-color: #f1de9a; background: #fff9e8; color: #7b5d00; }
+.status-summary { margin-top: 8px; color: #4d5f78; }
