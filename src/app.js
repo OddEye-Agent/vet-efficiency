@@ -150,7 +150,43 @@ function renderCompatibility() {
     { generic: 'Naloxone', common: 'Naloxone', brands: ['Narcan'], bolus: 'Slow IV titration to effect.', monitor: 'Respiratory drive, pain rebound.' },
     { generic: 'Flumazenil', common: 'Flumazenil', brands: ['Romazicon'], bolus: 'Slow IV titration to effect.', monitor: 'Sedation reversal, seizure risk.' },
     { generic: 'Calcium Gluconate', common: 'Calcium', brands: ['Calcium gluconate 10%'], bolus: 'Slow IV with ECG monitoring.', monitor: 'ECG continuously, perfusion, calcium level.' },
-    { generic: 'Mannitol', common: 'Mannitol', brands: ['Osmitrol'], bolus: 'Controlled infusion over protocol window.', monitor: 'Urine output, osmolality, volume status.' }
+    { generic: 'Mannitol', common: 'Mannitol', brands: ['Osmitrol'], bolus: 'Controlled infusion over protocol window.', monitor: 'Urine output, osmolality, volume status.' },
+
+    { generic: 'Acetylcysteine', common: 'NAC', brands: ['Parvolex', 'Acetadote'], bolus: 'Protocol-driven loading then infusion.', monitor: 'Anaphylactoid reaction signs, liver profile.' },
+    { generic: 'Alfentanil', common: 'Alfentanil', brands: ['Rapifen'], bolus: 'Slow IV titration.', monitor: 'Respiratory depression, sedation, BP.' },
+    { generic: 'Aminophylline', common: 'Aminophylline', brands: ['Aminophylline injection'], bolus: 'Slow IV over 20–30 min per protocol.', monitor: 'HR/rhythm, GI effects, CNS stimulation.' },
+    { generic: 'Amiodarone', common: 'Amiodarone', brands: ['Cordarone'], bolus: 'Controlled loading infusion; avoid rapid push.', monitor: 'ECG/QT, BP, infusion-site reactions.' },
+    { generic: 'Aprotinin', common: 'Aprotinin', brands: ['Trasylol'], bolus: 'Protocol-specific infusion only.', monitor: 'Hypersensitivity, coagulation markers.' },
+    { generic: 'Atracurium', common: 'Atracurium', brands: ['Tracrium'], bolus: 'Slow IV bolus or infusion per protocol.', monitor: 'TOF monitoring, BP, histamine effects.' },
+    { generic: 'Calcium Chloride', common: 'Calcium Chloride', brands: ['Calcium chloride 10%'], bolus: 'Very slow IV with secure line.', monitor: 'Continuous ECG, extravasation risk.' },
+    { generic: 'Cisatracurium', common: 'Cisatracurium', brands: ['Nimbex'], bolus: 'Slow IV bolus/infusion per protocol.', monitor: 'Neuromuscular monitoring, ventilation.' },
+    { generic: 'Clonidine', common: 'Clonidine', brands: ['Catapres'], bolus: 'Slow IV/enteral per protocol.', monitor: 'BP, HR, sedation.' },
+    { generic: 'Co-trimoxazole', common: 'TMP-SMX', brands: ['Bactrim', 'Septrin'], bolus: 'Infuse slowly per protocol.', monitor: 'Allergy, renal function, electrolytes.' },
+    { generic: 'Disodium Hydrogen Phosphate', common: 'Phosphate', brands: ['Glycophos'], bolus: 'Slow infusion only.', monitor: 'Calcium/phosphate levels, line precipitation.' },
+    { generic: 'Dopexamine', common: 'Dopexamine', brands: ['Dopacard'], bolus: 'Typically infusion titration.', monitor: 'BP/HR, arrhythmias, perfusion.' },
+    { generic: 'Drotrecogin Alfa (Activated)', common: 'Xigris', brands: ['Xigris'], bolus: 'Historical/legacy therapy protocol only.', monitor: 'Bleeding risk, coagulation profile.' },
+    { generic: 'Epoprostenol', common: 'Epoprostenol', brands: ['Flolan'], bolus: 'Dedicated infusion setup.', monitor: 'BP, oxygenation, line integrity.' },
+    { generic: 'Esmolol', common: 'Esmolol', brands: ['Brevibloc'], bolus: 'Loading then infusion per protocol.', monitor: 'HR, BP, perfusion.' },
+    { generic: 'Furosemide', common: 'Lasix', brands: ['Lasix'], bolus: 'Slow IV push/infusion per protocol.', monitor: 'Urine output, electrolytes, BP.' },
+    { generic: 'Gentamicin', common: 'Gentamicin', brands: ['Garamycin'], bolus: 'Infuse per protocol timing.', monitor: 'Renal values, therapeutic levels.' },
+    { generic: 'Glyceryl Trinitrate', common: 'GTN', brands: ['Nitroglycerin'], bolus: 'Usually infusion titration.', monitor: 'BP, perfusion, headache/tolerance.' },
+    { generic: 'Heparin (Sodium)', common: 'Heparin', brands: ['Heparin sodium'], bolus: 'Bolus + infusion protocolized.', monitor: 'aPTT/ACT, bleeding signs.' },
+    { generic: 'Isosorbide Dinitrate', common: 'ISDN', brands: ['Isoket'], bolus: 'Infusion/titration per protocol.', monitor: 'BP, perfusion, headache.' },
+    { generic: 'Labetalol', common: 'Labetalol', brands: ['Trandate'], bolus: 'Slow IV over 2 min or infusion.', monitor: 'HR, BP, bronchospasm risk.' },
+    { generic: 'Milrinone', common: 'Milrinone', brands: ['Primacor'], bolus: 'Loading dose then infusion per protocol.', monitor: 'BP, rhythm, renal function.' },
+    { generic: 'Morphine', common: 'Morphine', brands: ['Morphine sulfate'], bolus: 'Slow IV titration.', monitor: 'Respiratory status, sedation, GI effects.' },
+    { generic: 'Omeprazole', common: 'Omeprazole IV', brands: ['Losec'], bolus: 'Reconstitute/infuse per SPC.', monitor: 'Line compatibility, GI response.' },
+    { generic: 'Potassium Phosphate', common: 'KPhos', brands: ['Potassium phosphate injection'], bolus: 'Slow infusion only.', monitor: 'Calcium/phosphate, ECG, line precipitation.' },
+    { generic: 'Propofol', common: 'Propofol', brands: ['Diprivan'], bolus: 'Slow IV to effect or infusion.', monitor: 'Respiratory depression, BP, triglycerides (long infusion).' },
+    { generic: 'Remifentanil', common: 'Remifentanil', brands: ['Ultiva'], bolus: 'Titrated infusion; cautious bolus.', monitor: 'Respiration, bradycardia, sedation depth.' },
+    { generic: 'Rocuronium', common: 'Rocuronium', brands: ['Esmeron'], bolus: 'IV bolus/infusion per RSI/ICU protocol.', monitor: 'TOF, ventilation support.' },
+    { generic: 'Salbutamol', common: 'Albuterol', brands: ['Ventolin'], bolus: 'Usually nebulized/infusion per protocol.', monitor: 'HR, potassium, tremor.' },
+    { generic: 'Sodium Glycerophosphate', common: 'Glycophos', brands: ['Glycophos'], bolus: 'Slow infusion only.', monitor: 'Phosphate/calcium, precipitation risk.' },
+    { generic: 'Sodium Nitroprusside', common: 'SNP', brands: ['Nitropress'], bolus: 'Controlled infusion with shielding as needed.', monitor: 'Continuous BP, cyanide/thiocyanate toxicity risk.' },
+    { generic: 'Thiopental', common: 'Thiopentone', brands: ['Pentothal'], bolus: 'Slow IV to effect.', monitor: 'Respiratory/BP depression, airway support.' },
+    { generic: 'Vancomycin', common: 'Vancomycin', brands: ['Vancocin'], bolus: 'Infuse slowly (avoid rapid infusion).', monitor: 'Infusion reactions, renal values, levels.' },
+    { generic: 'Vasopressin', common: 'Arginine Vasopressin', brands: ['Vasostrict'], bolus: 'Usually low-dose infusion in shock protocols.', monitor: 'BP, perfusion, ischemic signs.' },
+    { generic: 'Vecuronium', common: 'Vecuronium', brands: ['Norcuron'], bolus: 'IV bolus/infusion per protocol.', monitor: 'TOF, ventilation support.' }
   ];
 
   const normalize = (s) => s.toLowerCase().trim();
@@ -230,6 +266,16 @@ function renderCompatibility() {
       reason: 'Potential pH-driven instability depending on concentration/formulation.',
       recommendation: 'Use separate lumen; verify compounding reference.'
     },
+    'potassium phosphate|calcium gluconate': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Calcium-phosphate precipitation risk.',
+      recommendation: 'Do not co-infuse in same line.'
+    },
+    'potassium phosphate|calcium chloride': {
+      level: 'incompatible', evidence: 'strong',
+      reason: 'Calcium-phosphate precipitation risk.',
+      recommendation: 'Do not co-infuse in same line.'
+    },
     'vincristine|doxorubicin': {
       level: 'incompatible', evidence: 'strong',
       reason: 'Operationally high-risk chemotherapy combination in shared line context.',
@@ -266,11 +312,6 @@ function renderCompatibility() {
       reason: 'Common combination but depends on prep parameters.',
       recommendation: 'Use protocol concentrations and verify policy.'
     },
-    'magnesium sulfate|enrofloxacin': {
-      level: 'limited', evidence: 'limited',
-      reason: 'Conflicting/insufficient compatibility evidence reported.',
-      recommendation: 'Avoid shared line when possible; separate lumen preferred.'
-    },
     'maropitant|ondansetron': {
       level: 'caution', evidence: 'limited',
       reason: 'Data may be incomplete for all concentrations/formulations.',
@@ -285,6 +326,32 @@ function renderCompatibility() {
       level: 'caution', evidence: 'moderate',
       reason: 'Frequent co-therapy; line compatibility depends on dilution/setup.',
       recommendation: 'Use standardized ICU protocol and close monitoring.'
+    },
+
+    'magnesium sulfate|enrofloxacin': {
+      level: 'limited', evidence: 'limited',
+      reason: 'Conflicting/insufficient compatibility evidence reported.',
+      recommendation: 'Avoid shared line when possible; separate lumen preferred.'
+    },
+    'magnesium sulfate|sodium bicarbonate': {
+      level: 'limited', evidence: 'limited',
+      reason: 'Potential precipitation/instability concern reported in some references.',
+      recommendation: 'Prefer separate lumen; verify Y-site data at actual concentrations.'
+    },
+    'omeprazole|vancomycin': {
+      level: 'limited', evidence: 'limited',
+      reason: 'pH-related compatibility concerns noted for omeprazole with some co-infusions.',
+      recommendation: 'Avoid shared line unless compatibility explicitly confirmed.'
+    },
+    'propofol|vancomycin': {
+      level: 'limited', evidence: 'limited',
+      reason: 'Emulsion compatibility may vary by formulation/line conditions.',
+      recommendation: 'Use separate lumen when possible.'
+    },
+    'thiopental|sodium bicarbonate': {
+      level: 'caution', evidence: 'limited',
+      reason: 'Alkaline chemistry/physical instability concerns in mixed conditions.',
+      recommendation: 'Check protocol and avoid unnecessary line co-mingling.'
     }
   };
 
@@ -412,7 +479,7 @@ function renderCompatibility() {
       <div class="status-summary">Checked ${selected.length} drugs (${(selected.length * (selected.length - 1)) / 2} pairings). Policy: <strong>${policy}</strong>.</div>
       ${rows.join('')}
       <div class="status-summary"><strong>Fluid Note:</strong> ${fluidNote}</div>
-      <div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
+      <div class="status-summary">Source baseline includes Thames Valley Y-Site Compatibility Chart (2011) plus prototype rules.</div><div class="status-summary">Always confirm against hospital formulary + current compatibility reference before administration.</div>
     `;
   });
 
